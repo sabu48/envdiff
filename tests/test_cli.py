@@ -62,3 +62,10 @@ def test_no_differences_no_exit_code_flag(tmp_env):
     a = tmp_env("a.env", "X=1\n")
     b = tmp_env("b.env", "X=1\n")
     assert main([str(a), str(b), "--exit-code"]) == 0
+
+
+def test_keys_only_in_one_file_exit_one_with_flag(tmp_env):
+    """A key present in only one file should count as a difference."""
+    a = tmp_env("a.env", "FOO=bar\nEXTRA=1\n")
+    b = tmp_env("b.env", "FOO=bar\n")
+    assert main([str(a), str(b), "--exit-code"]) == 1
