@@ -40,6 +40,13 @@ def test_missing_file_returns_2(tmp_env, tmp_path):
     assert main([str(a), str(missing)]) == 2
 
 
+def test_both_files_missing_returns_2(tmp_path):
+    """Both files missing should also return exit code 2."""
+    missing_a = tmp_path / "ghost_a.env"
+    missing_b = tmp_path / "ghost_b.env"
+    assert main([str(missing_a), str(missing_b)]) == 2
+
+
 def test_json_output_is_valid(tmp_env, capsys):
     a = tmp_env("a.env", "FOO=bar\nONLY_A=1\n")
     b = tmp_env("b.env", "FOO=bar\nONLY_B=2\n")
