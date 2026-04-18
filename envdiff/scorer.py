@@ -25,10 +25,10 @@ class SimilarityScore:
 
 def score(result: DiffResult) -> SimilarityScore:
     """Compute a similarity score from a DiffResult."""
-    only_first = set(result.missing_in_second.keys())
-    only_second = set(result.missing_in_first.keys())
-    mismatched = set(result.mismatched.keys())
-    matching = set(result.matching.keys())
+    only_first = set(result.missing_in_second)  # keys in base but not in target
+    only_second = set(result.missing_in_first)  # keys in target but not in base
+    mismatched = set(result.mismatched.keys())  # keys present in both but with different values
+    matching = set(result.matching.keys())  # keys present in both with identical values
 
     common_keys = matching | mismatched
     all_keys = common_keys | only_first | only_second

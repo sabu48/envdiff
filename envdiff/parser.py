@@ -39,7 +39,7 @@ def parse_env_file(path: str | Path) -> Dict[str, Optional[str]]:
             line = raw_line.strip()
 
             # Skip blank lines and comments
-            if not"#"):
+            if not line or line.startswith("#"):
                 continue
 
             match = ENV_LINE_RE.match(line)
