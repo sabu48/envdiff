@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 DEFAULT_PATTERNS = [
     re.compile(r"(password|passwd|secret|token|api_key|private_key|auth)", re.IGNORECASE),
@@ -14,6 +14,21 @@ REDACTED = "***REDACTED***"
 def _is_sensitive(key: str, extra_patterns: Optional[list] = None) -> bool:
     patterns = DEFAULT_PATTERNS + (extra_patterns or [])
     return any(p.search(key) for p in patterns)
+
+
+def compile_patterns(patterns: List[str]) -> List[re.Pattern]:
+    """Compile a list of regex strings into pattern objects.
+
+    Convenience helper so callers don't need to import ``re`` just to
+    pass extra patterns to :func:`redact_env` or :func:`redact_diff`.
+
+    Args:
+        patterns: List of regular expression strings.
+
+    Returns:
+        List of compiled :class:`re.Pattern` objects.
+    """
+    return [re.compile(p, re.IGNORECASE) for p in patterns]
 
 
 def redact_env(
