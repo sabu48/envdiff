@@ -10,8 +10,8 @@ def _result(
     return DiffResult(
         matching=matching or {},
         mismatched=mismatched or {},
-        missing_in_first=missing_in_first or {},
-        missing_in_second=missing_in_second or {},
+        missing_in_first=missing_in_first or [],
+        missing_in_second=missing_in_second or [],
     )
 
 
@@ -24,7 +24,7 @@ def test_identical_envs_score_one():
 
 
 def test_no_common_keys_score_zero():
-    r = _result(missing_in_first={"B": "2"}, missing_in_second={"A": "1"})
+    r = _result(missing_in_first=["B"], missing_in_second=["A"])
     s = score(r)
     assert s.key_overlap == 0.0
     assert s.value_match == 1.0  # no common keys → defaults to 1.0
@@ -32,7 +32,7 @@ def test_no_common_keys_score_zero():
 
 
 def test_all_mismatched_value_match_zero():
-    r = _result(mismatched={"A": ("1", "2"), "B": ("x", "y")})
+    r = _result(mismatched={"A": {"first": "1", "second": "2"}, "B": {"first": "x", "second": "y"}})
     s = score(r)
     assert s.key_overlap == 1.0
     assert s.value_match == 0.0
@@ -42,8 +42,8 @@ def test_all_mismatched_value_match_zero():
 def test_partial_overlap():
     r = _result(
         matching={"A": "1"},
-        mismatched={"B": ("2", "3")},
-        missing_in_second={"C": "4"},
+        mismatched={"B": {"first": "2", "second": "3"}},
+        missing_in_second=["C"],
     )
     s = score(r)
     assert s.total_keys == 3
@@ -62,7 +62,7 @@ def test_empty_result():
 
 def test_score_many_returns_dict():
     r1 = _result(matching={"X": "1"})
-    r2 = _result(mismatched={"X": ("1", "2")})
+    r2 = _result(mismatched={"X": {"first": "1", "second": "2"}})
     results = score_many({"pair_a": r1, "pair_b": r2})
     assert set(results.keys()) == {"pair_a", "pair_b"}
     assert isinstance(results["pair_a"], SimilarityScore)

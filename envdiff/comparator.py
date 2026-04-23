@@ -11,6 +11,7 @@ class DiffResult:
     missing_in_second: List[str] = field(default_factory=list)
     missing_in_first: List[str] = field(default_factory=list)
     mismatched: Dict[str, Dict[str, Optional[str]]] = field(default_factory=dict)
+    matching: Dict[str, str] = field(default_factory=dict)  # keys present in both with identical values
 
     @property
     def has_differences(self) -> bool:
@@ -58,5 +59,7 @@ def compare(
             result.missing_in_first.append(key)
         elif first[key] != second[key]:
             result.mismatched[key] = {"first": first[key], "second": second[key]}
+        else:
+            result.matching[key] = first[key]
 
     return result
