@@ -14,6 +14,7 @@ def tmp_envs(tmp_path):
 
 
 def _run_with(args_list):
+    """Parse args_list and invoke _run, returning the exit code."""
     parser = build_graph_parser()
     args = parser.parse_args(args_list)
     return _run(args)
@@ -69,3 +70,16 @@ def test_three_files_produces_three_edges(tmp_envs, capsys):
     out = capsys.readouterr().out
     data = json.loads(out)
     assert len(data) == 3
+
+
+def test_json_overlap_ratio_value(tmp_envs, capsys):
+    """overlap_ratio should be 0.5 when one of two keys is shared."""
+    a = tmp_envs("a.env", "SHARED=1\nONLY_A=2\n")
+    b = tmp_envs("b.env", "SHARED=1\nONLY_B=3\n")
+    _run_with([a, b, "--format", "json"])
+    out = capsys.readouterr().out
+    data = json.loads(out)
+    assert len(data) == 1
+    ratio = data[0]["overlap_ratio"]
+    # union has 3 keys, intersection has 1 → ratio = 1/3 ≈ 0.333
+    assert 0.0 < ratio < 1.0
