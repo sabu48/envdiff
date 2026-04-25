@@ -71,3 +71,19 @@ def redact_diff(
     result["matched"] = matched
 
     return result
+
+
+def sensitive_keys(env: Dict[str, Optional[str]], extra_patterns: Optional[list] = None) -> List[str]:
+    """Return a sorted list of keys in *env* that match sensitive patterns.
+
+    Useful for auditing which variables will be redacted before actually
+    performing redaction.
+
+    Args:
+        env: Mapping of environment variable names to their values.
+        extra_patterns: Additional compiled patterns beyond the defaults.
+
+    Returns:
+        Sorted list of sensitive key names found in *env*.
+    """
+    return sorted(k for k in env if _is_sensitive(k, extra_patterns))
